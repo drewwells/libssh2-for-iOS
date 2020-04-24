@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 
-#  Automatic build script for libssh2 
+#  Automatic build script for libssh2
 #  for iPhoneOS and iPhoneSimulator
 #
 #  Created by Felix Schulze on 01.02.11.
@@ -36,6 +36,7 @@ then
 	lipo -create -output openssl.framework/openssl build/Debug-iphonesimulator/openssl.framework/openssl build/Debug-iphoneos/openssl.framework/openssl
 	# if you don't need bitcode, use this line instead:
 	# ./openssl/create-openssl-framework.sh dynamic
+
 	echo "Build libssh2:"
 	./build-libssh2.sh openssl
 	# Make dynamic framework, with embed-bitcode, iOS + Simulator:

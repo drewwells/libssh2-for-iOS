@@ -12,6 +12,8 @@ You can build the libssh2 library with openssl or with libgcrypt!
 - Xcode 7.1
 - Xcode Command Line Tools
 
+        brew install automake autoconf
+
 ## Readme
 ### Checkout the submodules:
 ```bash

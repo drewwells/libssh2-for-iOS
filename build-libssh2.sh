@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Automatic build script for libssh2 
+#  Automatic build script for libssh2
 #  for iPhoneOS and iPhoneSimulator
 #
 #  Created by Felix Schulze on 02.02.11.
@@ -21,12 +21,12 @@
 ###########################################################################
 #  Change values here
 #
-VERSION="1.8.0"
+VERSION="1.9.0"
 #
 ###########################################################################
 #
 # Don't change anything here
-SDKVERSION=`xcrun -sdk iphoneos --show-sdk-version`                                                          
+SDKVERSION=`xcrun -sdk iphoneos --show-sdk-version`
 CURRENTPATH=`pwd`
 ARCHS="i386 x86_64 armv7 armv7s arm64"
 DEVELOPER=`xcode-select -print-path`
@@ -64,7 +64,7 @@ do
 	echo "Building libssh2 for ${PLATFORM} ${SDKVERSION} ${ARCH}"
 	echo "Please stand by..."
 	tar zxf libssh2-${VERSION}.tar.gz -C src
-	cd src/libssh2-${VERSION}
+	cd src/libssh2
 
 	PATCHFILE=`find ../.. | grep with-libgcrypt-prefix.patch`
 	patch -p2 < $PATCHFILE
@@ -87,14 +87,14 @@ do
 
 	LOG="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk/build-libssh2-${VERSION}.log"
 	echo ${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk
-	
-		
+
+
 	HOST="${ARCH}"
 	if [ "${ARCH}" == "arm64" ];
 	then
 		HOST="aarch64"
 	fi
-	
+
 	autoconf
 
 	if [ "$1" == "openssl" ];
@@ -103,16 +103,16 @@ do
 	else
 		./configure --host=${HOST}-apple-darwin --prefix="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk" --with-libgcrypt --with-libgcrypt-prefix=${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk --disable-shared --enable-static  >> "${LOG}" 2>&1
 	fi
-	
+
 	make >> "${LOG}" 2>&1
 	make install >> "${LOG}" 2>&1
 	cd ${CURRENTPATH}
 	rm -rf src/libssh2-${VERSION}
-	
+
 done
 
 echo "Build library..."
-#  
+#
 lipo -create ${CURRENTPATH}/bin/iPhoneSimulator${SDKVERSION}-i386.sdk/lib/libssh2.a ${CURRENTPATH}/bin/iPhoneSimulator${SDKVERSION}-x86_64.sdk/lib/libssh2.a ${CURRENTPATH}/bin/iPhoneOS${SDKVERSION}-armv7s.sdk/lib/libssh2.a ${CURRENTPATH}/bin/iPhoneOS${SDKVERSION}-armv7.sdk/lib/libssh2.a ${CURRENTPATH}/bin/iPhoneOS${SDKVERSION}-arm64.sdk/lib/libssh2.a -output ${CURRENTPATH}/lib/libssh2.a
 mkdir -p ${CURRENTPATH}/include/libssh2
 cp -R ${CURRENTPATH}/bin/iPhoneSimulator${SDKVERSION}-i386.sdk/include/libssh2* ${CURRENTPATH}/include/libssh2/
