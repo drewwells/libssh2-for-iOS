@@ -21,15 +21,14 @@
 if [ "$1" == "openssl" ];
 then
 	echo "Building openssl: $2"
-	# ./openssl/build-libssl.sh --version=1.1.0j --deprecated $2
-	./openssl/build-libssl.sh $2
+	./build-libssl.sh --archs="x86_64 arm64" --targets="ios-sim-cross-x86_64 ios64-sim-cross-arm64 ios64-cross-arm64" $2
 	# Make dynamic framework, with embed-bitcode, iOS + Simulator:
 	rm -rf build
 	rm -rf openssl.framework
-	xcodebuild -project libssh2-for-iOS.xcodeproj -target openssl -sdk iphoneos  -configuration Debug
+	xcodebuild -project libssh2-for-iOS.xcodeproj -UseModernBuildSystem=NO -target openssl -sdk iphoneos  -configuration Debug
 	mkdir -p build/Debug-iphoneos/openssl.framework/Headers/
 	cp include/openssl/* build/Debug-iphoneos/openssl.framework/Headers/
-	xcodebuild -project libssh2-for-iOS.xcodeproj -target openssl -sdk iphonesimulator -destination 'platform=iOS Simulator,OS=13.4' -arch x86_64 -arch i386  -configuration Debug
+	xcodebuild -project libssh2-for-iOS.xcodeproj -UseModernBuildSystem=NO -target openssl -sdk iphonesimulator -destination 'platform=iOS Simulator,OS=13.4' -arch x86_64 -arch arm64  -configuration Debug
 	mkdir -p build/Debug-iphonesimulator/openssl.framework/Headers/
 	cp include/openssl/* build/Debug-iphonesimulator/openssl.framework/Headers/
 	cp -r build/Debug-iphoneos/openssl.framework .
@@ -41,10 +40,10 @@ then
 	./build-libssh2.sh openssl
 	# Make dynamic framework, with embed-bitcode, iOS + Simulator:
 	rm -rf libssh2.framework
-	xcodebuild -project libssh2-for-iOS.xcodeproj -target libssh2 -sdk iphoneos  -configuration Debug
+	xcodebuild -UseModernBuildSystem=NO -project libssh2-for-iOS.xcodeproj -target libssh2 -sdk iphoneos  -configuration Debug
 	mkdir -p build/Debug-iphoneos/libssh2.framework/Headers/
 	cp include/libssh2/* build/Debug-iphoneos/libssh2.framework/Headers/
-	xcodebuild -project libssh2-for-iOS.xcodeproj -target libssh2 -sdk iphonesimulator -destination 'platform=iOS Simulator,OS=13.4' -arch x86_64 -arch i386  -configuration Debug
+	xcodebuild -UseModernBuildSystem=NO -project libssh2-for-iOS.xcodeproj -target libssh2 -sdk iphonesimulator -destination 'platform=iOS Simulator,OS=13.4' -arch x86_64 -arch i386  -configuration Debug
 	mkdir -p build/Debug-iphonesimulator/libssh2.framework/Headers/
 	cp include/libssh2/* build/Debug-iphonesimulator/libssh2.framework/Headers/
 	cp -r build/Debug-iphoneos/libssh2.framework .
