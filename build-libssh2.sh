@@ -41,7 +41,7 @@ fi
 
 echo "Checking file: libssh2-${VERSION}.tar.gz"
 md5=`md5 -q libssh2-${VERSION}.tar.gz`
-if [ $md5 != "3d1147cae66e2959ea5441b183de1b1c" ]
+if [ $md5 != "7d5214b06f08dc9ec13a901782981c9b" ]
 then
 	echo "File corrupt, please download again."
 	exit 1
