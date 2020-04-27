@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x -e
 
 #  Automatic build script for libssh2
 #  for iPhoneOS and iPhoneSimulator
@@ -34,14 +34,14 @@ DEVELOPER=`xcode-select -print-path`
 set -e
 if [ ! -e libssh2-${VERSION}.tar.gz ]; then
 	echo "Downloading libssh2-${VERSION}.tar.gz"
-    curl -O https://www.libssh2.org/download/libssh2-${VERSION}.tar.gz
+    curl --fail -O https://www.libssh2.org/download/libssh2-${VERSION}.tar.gz
 else
 	echo "Using libssh2-${VERSION}.tar.gz"
 fi
 
 echo "Checking file: libssh2-${VERSION}.tar.gz"
 md5=`md5 -q libssh2-${VERSION}.tar.gz`
-if [ $md5 != "7d5214b06f08dc9ec13a901782981c9b" ]
+if [ $md5 != "1beefafe8963982adc84b408b2959927" ]
 then
 	echo "File corrupt, please download again."
 	exit 1
@@ -53,6 +53,9 @@ mkdir -p bin
 mkdir -p lib
 mkdir -p src
 
+tar zxf libssh2-${VERSION}.tar.gz -C src
+cd src/libssh2-${VERSION}
+
 for ARCH in ${ARCHS}
 do
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]];
@@ -62,12 +65,7 @@ do
 		PLATFORM="iPhoneOS"
 	fi
 	echo "Building libssh2 for ${PLATFORM} ${SDKVERSION} ${ARCH}"
-	echo "Please stand by..."
-	tar zxf libssh2-${VERSION}.tar.gz -C src
-	cd src/libssh2
-
-	PATCHFILE=`find ../.. | grep with-libgcrypt-prefix.patch`
-	patch -p2 < $PATCHFILE
+	echo "Please stand by...!"
 
 	export M4="${DEVELOPER}/Toolchains/XcodeDefault.xctoolchain/usr/bin/gm4"
 	export DEVROOT="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
@@ -88,7 +86,6 @@ do
 	LOG="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk/build-libssh2-${VERSION}.log"
 	echo ${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk
 
-
 	HOST="${ARCH}"
 	if [ "${ARCH}" == "arm64" ];
 	then
@@ -96,12 +93,11 @@ do
 	fi
 
 	autoconf
-
 	if [ "$1" == "openssl" ];
 	then
-		./configure --host=${HOST}-apple-darwin --prefix="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk" --with-openssl --with-libssl-prefix=${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk --disable-shared --enable-static  >> "${LOG}" 2>&1
+		./configure --host=${HOST}-apple-darwin --prefix="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk" --with-crypto=openssl --with-libssl-prefix=${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk --disable-shared --enable-static  >> "${LOG}" 2>&1
 	else
-		./configure --host=${HOST}-apple-darwin --prefix="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk" --with-libgcrypt --with-libgcrypt-prefix=${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk --disable-shared --enable-static  >> "${LOG}" 2>&1
+		./configure --host=${HOST}-apple-darwin --prefix="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk" --with-crypto=libgcrypt --with-libgcrypt-prefix=${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk --disable-shared --enable-static  >> "${LOG}" 2>&1
 	fi
 
 	make >> "${LOG}" 2>&1

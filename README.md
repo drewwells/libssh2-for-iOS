@@ -12,7 +12,19 @@ You can build the libssh2 library with openssl or with libgcrypt!
 - Xcode 7.1
 - Xcode Command Line Tools
 
-        brew install automake autoconf
+        brew install automake autoconf libssh2
+
+Be sure to include libssh2 headers. Brew recommends steps to do so:
+
+If you need to have openssl@1.1 first in your PATH run:
+
+        echo 'export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"' >> ~/.zshrc
+
+For compilers to find openssl@1.1 you may need to set:
+
+        export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
+        export CPPFLAGS="-I/usr/local/opt/openssl@1.1/include"
+
 
 ## Readme
 ### Checkout the submodules:
