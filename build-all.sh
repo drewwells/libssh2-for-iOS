@@ -21,7 +21,7 @@
 if [ "$1" == "openssl" ];
 then
 	echo "Building openssl: $2"
-	./build-libssl.sh --archs="x86_64 arm64" --targets="ios-sim-cross-x86_64 ios64-sim-cross-arm64 ios64-cross-arm64" $2
+	./build-libssl.sh --archs="x86_64 arm64" --targets="ios-sim-cross-x86_64 ios64-cross-arm64" $2
 	# Make dynamic framework, with embed-bitcode, iOS + Simulator:
 	rm -rf build
 	rm -rf openssl.framework

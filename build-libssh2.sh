@@ -53,10 +53,6 @@ mkdir -p bin
 mkdir -p lib
 mkdir -p src
 
-tar zxf libssh2-${VERSION}.tar.gz -C src
-cd src/libssh2-${VERSION}
-./buildconf
-
 for ARCH in ${ARCHS}
 do
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]];
@@ -96,6 +92,7 @@ do
 
 	if [ "$1" == "openssl" ];
 	then
+        pwd
 		./configure --host=${HOST}-apple-darwin --prefix="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk" --with-crypto=openssl --with-libssl-prefix=${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk --disable-shared --enable-static  >> "${LOG}"
 	else
 		./configure --host=${HOST}-apple-darwin --prefix="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk" --with-crypto=libgcrypt --with-libgcrypt-prefix=${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk --disable-shared --enable-static  >> "${LOG}"

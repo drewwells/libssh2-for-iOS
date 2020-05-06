@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 #  Automatic build script for libssl and libcrypto
 #  for iPhoneOS and iPhoneSimulator
@@ -26,13 +26,14 @@ set -u
 
 # Default version in case no version is specified
 DEFAULTVERSION="1.1.0l"
+DEVELOPER=`xcode-select -print-path`
 
 # Default (=full) set of targets to build
 DEFAULTTARGETS="ios-sim-cross-x86_64 ios64-cross-arm64 tvos-sim-cross-x86_64 tvos64-cross-arm64"  # mac-catalyst-x86_64 is a valid target that is not in the DEFAULTTARGETS because it's incompatible with "ios-sim-cross-x86_64"
 
 # Minimum iOS/tvOS SDK version to build for
-IOS_MIN_SDK_VERSION="12.0"
-TVOS_MIN_SDK_VERSION="12.0"
+IOS_MIN_SDK_VERSION="13.0"
+TVOS_MIN_SDK_VERSION="13.0"
 MACOSX_MIN_SDK_VERSION="10.15"
 
 # Init optional env variables (use available variable or default to empty string)
@@ -66,6 +67,9 @@ echo_help()
 
 spinner()
 {
+  # spinner is incompatible with set -x
+  old_setting=${-//[^x]/}
+  set +x
   local pid=$!
   local delay=0.75
   local spinstr='|/-\'
@@ -76,7 +80,7 @@ spinner()
     sleep $delay
     printf "\b\b\b\b\b"
   done
-
+  if [[ -n "$old_setting" ]]; then set -x; else set +x; fi
   wait $pid
   return $?
 }
@@ -85,7 +89,10 @@ spinner()
 prepare_target_source_dirs()
 {
   # Prepare target dir
-  TARGETDIR="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk"
+  if [ -z "$TARGETDIR" ]; then
+      TARGETDIR="${CURRENTPATH}/bin/${PLATFORM}${SDKVERSION}-${ARCH}.sdk"
+  fi
+
   mkdir -p "${TARGETDIR}"
   LOG="${TARGETDIR}/build-openssl-${VERSION}.log"
 
@@ -229,6 +236,10 @@ case $i in
     ;;
   --ios-sdk=*)
     IOS_SDKVERSION="${i#*=}"
+    shift
+    ;;
+  --prefix=*)
+    TARGETDIR="${i#*=}"
     shift
     ;;
   --macosx-sdk=*)
